@@ -3,9 +3,9 @@
 using namespace ariel;
 
 
-TEST_CASE("WRITE"){
+TEST_CASE("BAD_INPUT"){
     Notebook note1;
-    SUBCASE("BAD_INPUT"){
+    SUBCASE("WRITE"){
         /*page, row, col mast be positive*/
         for (size_t i = 0; i < 30; i++)
         {
@@ -23,7 +23,7 @@ TEST_CASE("WRITE"){
 
         /*string length + col > 100*/
         string str = string("");
-        for (size_t i = 0; i < 100; i++)
+        for (size_t i = 0; i <= 100; i++)
         {
             str.append("a");
         }
@@ -31,8 +31,72 @@ TEST_CASE("WRITE"){
         CHECK_THROWS_MESSAGE(note1.write(0, 0, 99, Direction::Horizontal, "aaa"), "string length is out of bounds, try change COL or STR");
         CHECK_THROWS_MESSAGE(note1.write(0, 0, 100, Direction::Horizontal, "aa"), "string length is out of bounds, try change COL or STR");
 
-        /*Attempt to write in a place where they have already written*/
-        
+        /*Attempt to write in a place that has already been written*/
+        note1.write(1, 0, 0, Direction::Horizontal, "a");
+        CHECK_THROWS_MESSAGE(note1.write(1, 0, 0, Direction::Horizontal, "a"), "this position is already token");
+        note1.erase(1, 0, 0,Direction::Horizontal, 1);
+        CHECK_THROWS_MESSAGE(note1.write(1, 0, 0, Direction::Horizontal, "a"), "this position is already token"); //can't even after erase
+
     }
-    
+
+    SUBCASE("READ"){
+        /*page, row, col, len mast be positive*/
+        for (size_t i = 0; i < 30; i++)
+        {
+            int v1 = (rand() % 100 + 1)*-1;
+            CHECK_THROWS_MESSAGE(note1.read(v1, 0, 0, Direction::Horizontal, 1), "PAGE must be positive");
+            CHECK_THROWS_MESSAGE(note1.read(0, v1, 0, Direction::Horizontal, 1), "ROW must be positive");
+            CHECK_THROWS_MESSAGE(note1.read(0, 0, v1, Direction::Horizontal, 1), "COL must be positive");
+            CHECK_THROWS_MESSAGE(note1.read(0, 0, 0, Direction::Horizontal, v1), "LEN must be positive"); 
+        }
+        CHECK_THROWS_MESSAGE(note1.read(0, 0, 0, Direction::Horizontal, 0), "LEN must be positive");
+
+        /*try to read more than 100 chars (len+col < 100)*/
+        CHECK_THROWS_MESSAGE(note1.read(0, 0, 0, Direction::Horizontal, 101), "LEN can't be >100");
+        CHECK_THROWS_MESSAGE(note1.read(0, 0, 100, Direction::Horizontal, 2), "LEN is out of bounds - try change COL or LEN");
+        CHECK_THROWS_MESSAGE(note1.read(0, 0, 50, Direction::Horizontal, 51), "LEN is out of bounds - try change COL or LEN");
+
+        /*try to read from non-created page*/
+        CHECK_THROWS_MESSAGE(note1.read(1500, 0, 0, Direction::Horizontal, 1), "This page has not yet been created");
+
+    }
+
+    SUBCASE("ERASE"){
+        /*page, row, col, len mast be positive*/
+        for (size_t i = 0; i < 30; i++)
+        {
+            int v1 = (rand() % 100 + 1)*-1;
+            CHECK_THROWS_MESSAGE(note1.erase(0, v1, 0, Direction::Horizontal, 1), "ROW must be positive");
+            CHECK_THROWS_MESSAGE(note1.erase(0, 0, v1, Direction::Horizontal, 1), "COL must be positive");
+            CHECK_THROWS_MESSAGE(note1.erase(v1, 0, 0, Direction::Horizontal, 1), "PAGE must be positive");
+            CHECK_THROWS_MESSAGE(note1.erase(0, 0, 0, Direction::Horizontal, v1), "LEN must be positive"); 
+        }
+        CHECK_THROWS_MESSAGE(note1.erase(0, 0, 0, Direction::Horizontal, 0), "LEN must be positive");
+
+        /*try to erase more than 100 chars (len+col < 100)*/
+        CHECK_THROWS_MESSAGE(note1.erase(0, 0, 0, Direction::Horizontal, 101), "LEN can't be >100");
+        CHECK_THROWS_MESSAGE(note1.erase(0, 0, 100, Direction::Horizontal, 2), "LEN is out of bounds - try change COL or LEN");
+        CHECK_THROWS_MESSAGE(note1.erase(0, 0, 50, Direction::Horizontal, 51), "LEN is out of bounds - try change COL or LEN");
+
+        /*try to erase from non-created page*/
+        CHECK_THROWS_MESSAGE(note1.erase(1500, 0, 0, Direction::Horizontal, 1), "This page has not yet been created");
+    }
+
+}
+
+TEST_CASE("GOOD_INPUT"){
+    Notebook note1;
+    note1.write(0, 0, 0, Direction::Vertical, "abcde");
+    CHECK(note1.read(0, 0, 0, Direction::Vertical, 5) = "abcde");
+    note1.erase(0, 0, 2, Direction::Vertical, 2);
+    CHECK(note1.read(0, 0, 0, Direction::Vertical, 5) = "ab~~e"); //after erase
+    CHECK(note1.read(0, 0, 0, Direction::Vertical, 10) = "ab~~e_____"); //both written & not-written chars
+    CHECK(note1.read(0, 0, 8, Direction::Vertical, 10) = "__________"); //created line, not-written chars
+    note1.write(100,100,50, Direction::Horizontal, "abcd");
+    CHECK(note1.read(100, 99, 51, Direction::Vertical, 3) = "_b_"); //write Horizontal, read Vertical
+    note1.write(100, 99, 52, Direction::Vertical, "xyz");
+    note1.erase(100, 99, 51, Direction::Vertical, 3);
+    CHECK(note1.read(100, 99, 50, Direction::Horizontal, 3) = "_~_");
+    CHECK(note1.read(100, 100, 50, Direction::Horizontal, 3) = "a~c");
+    CHECK(note1.read(100, 101, 50, Direction::Horizontal, 3) = "_~_");
 }
