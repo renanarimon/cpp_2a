@@ -3,21 +3,30 @@
 namespace ariel
 {
 
-    void Notebook::write(unsigned int page, unsigned int row, unsigned int col, Direction dir, string text)
+    void Notebook::write(int page, int row, int col, Direction dir, string const &text)
     {
         cout << "write\n";
     };
-    string Notebook::read(unsigned int page, unsigned int row, unsigned int col, Direction dir, unsigned int len) const
+    string Notebook::read(int page, int row, int col, Direction dir, int len) const
     {
         return "read";
     };
-    void Notebook::erase(unsigned int page, unsigned int row, unsigned int col, Direction dir, unsigned int len)
+    void Notebook::erase(int page, int row, int col, Direction dir, int len)
     {
         cout << "erase\n";
     };
-    void Notebook::show(unsigned int page)
+    void Notebook::show(int page) const
     {
         cout << "show\n";
     };
+
+    Notebook::Notebook()
+    {
+        this->_size = 0;
+    }
+    Notebook::~Notebook()
+    {
+        cout << "destroy\n";
+    }
 
 }
