@@ -37,6 +37,11 @@ TEST_CASE("BAD_INPUT"){
         note1.erase(1, 0, 0,Direction::Horizontal, 1);
         CHECK_THROWS_MESSAGE(note1.write(1, 0, 0, Direction::Horizontal, "a"), "this position is already token"); //can't even after erase
 
+        /*can't write '~'*/
+        CHECK_THROWS_MESSAGE(note1.write(0, 0, 8, Direction::Horizontal, "~"), "can't write '~'");
+        CHECK_THROWS_MESSAGE(note1.write(0, 8, 8, Direction::Horizontal, "ab~cd"), "can't write '~'");
+
+
     }
 
     SUBCASE("READ"){

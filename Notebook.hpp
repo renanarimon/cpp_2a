@@ -13,24 +13,14 @@ namespace ariel
     {
     private:
         unsigned int _size;
-        // map<unsigned int, map<unsigned int, char[100]>> _notebook;
-
     public:
         Notebook();
         ~Notebook();
-        void write(int, int, int, Direction, string const &);
-        string read(int page, int row, int col, Direction dir, int len) const;
-        void erase(int page, int row, int col, Direction dir, int len);
-        void show(int page) const;
+        static void write(int, int, int, Direction, string const &);
+        static string read(int page, int row, int col, Direction dir, int len);
+        static void erase(int page, int row, int col, Direction dir, int len);
+        static void show(int page);
     };
-
-    // Notebook::Notebook()
-    // {
-    // }
-
-    // Notebook::~Notebook()
-    // {
-    // }
 
 }
 #endif

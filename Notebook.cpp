@@ -7,7 +7,7 @@ namespace ariel
     {
         cout << "write\n";
     };
-    string Notebook::read(int page, int row, int col, Direction dir, int len) const
+    string Notebook::read(int page, int row, int col, Direction dir, int len)
     {
         return "read";
     };
@@ -15,7 +15,7 @@ namespace ariel
     {
         cout << "erase\n";
     };
-    void Notebook::show(int page) const
+    void Notebook::show(int page)
     {
         cout << "show\n";
     };
